@@ -1,9 +1,11 @@
 #include <iostream>
+#include <limits>
+
 using namespace std; 
 
 
 class MainMenu {
-	int input = 1; 
+	int input = 0; 
 	public:
 
 		void showMenu() {
@@ -33,14 +35,48 @@ class MainMenu {
 };
 
 class Inserter {
+	char name[15];
+	int ID;
+	int birthYear;
+	int tel;
+	string dep; //size of department not defined 
 	public:
-		void insertInfo() {
 
+		// NAME and STUDENT IT should not be blank. 
+		// STUDENT ID should be exactly 10 digits, BIRTH YEAR needs to be exactly 4 digits - in the correct birth year format
+		// TEL should be up to 12 digits.
+
+		void insertInfo() {
+			
+			cout << "Name: ";
+			cin >> name;
+
+			
+
+			cout << "Student ID (10 digits): ";
+			cin >> ID;
+
+
+
+			cout << "Birth Year (4 digits): ";
+			cin >> birthYear; 
+
+
+
+			cout << "Department: ";
+			cin >> dep;
+
+
+
+			cout << "Tel: ";
+			cin >> tel;
+
+			//write information onto the file 
 		}
 
 };
 
-class searcher {
+class Searcher {
 
 
 
@@ -50,17 +86,25 @@ class searcher {
 
 int main(int argc, char*argv[]) {
 
+	if (argc != 2)
+	{
+		cout << "detected wrong format of input arguements. Please input a filename after executable file : ";
+		return 0;
+	}
+
 	string filename = argv[1];
-	MainMenu menu; 
+	MainMenu menu;
+	Inserter insert; 
+	Searcher search; 
 	
-	while (menu.returnInput())
+	while (menu.returnInput()!=4)
 	{
 		menu.showMenu();
 		menu.getInput();
 		switch (menu.returnInput())
 		{
 		case 1:
-
+			insert.insertInfo();
 			break;
 		case 2:
 
