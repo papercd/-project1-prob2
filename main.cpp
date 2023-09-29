@@ -1,4 +1,6 @@
 #include <iostream>
+#include <fstream>
+#include <cmath>
 #include <limits>
 
 using namespace std; 
@@ -29,43 +31,50 @@ class MainMenu {
 };
 
 class Inserter {
-	char name[15];
-	int ID;
-	int birthYear;
-	int tel;
-	string dep; //size of department not defined 
 	public:
 
 		// NAME and STUDENT IT should not be blank. 
 		// STUDENT ID should be exactly 10 digits, BIRTH YEAR needs to be exactly 4 digits - in the correct birth year format
 		// TEL should be up to 12 digits.
 
-		void insertInfo() {
-			
-			cout << "Name: ";
-			cin >> name;
+		void insertInfo(string filename, fstream &inoutfile) {
+			char name[15];
+			char ID[10];
+			char birthYear[4];
+			char tel[12];
+			string dep;
 
-			
+			inoutfile.open(filename,ios::app);
 
-			cout << "Student ID (10 digits): ";
-			cin >> ID;
+			if (inoutfile.is_open())
+			{
+				cout << "Name: ";
+				cin >> name;
 
+		
+				cout << "Student ID (10 digits): ";
+				cin >> ID;
 
-
-			cout << "Birth Year (4 digits): ";
-			cin >> birthYear; 
-
-
-
-			cout << "Department: ";
-			cin >> dep;
-
+				cout << "Birth Year (4 digits): ";
+				cin >> birthYear;
 
 
-			cout << "Tel: ";
-			cin >> tel;
 
-			//write information onto the file 
+				cout << "Department: ";
+				cin >> dep;
+
+
+
+				cout << "Tel: ";
+				cin >> tel;
+
+
+
+				inoutfile << name << " " << birthYear << " "<< ID <<  " " << tel << " " << dep << "\n";
+				
+				inoutfile.close();
+			}
+			else cout << "Unable to open file"; 
 		}
 
 };
@@ -122,8 +131,11 @@ int main(int argc, char*argv[]) {
 		cout << "detected wrong format of input arguements. Please input a .txt filename after executable file ." << endl;
 		return 0;
 	}
+	//add another part that detects whether the string of input argument ends with .txt
 
 	string filename = argv[1];
+	fstream inoutfile;
+	
 	MainMenu menu;
 	Inserter insert; 
 	Searcher search; 
@@ -136,7 +148,7 @@ int main(int argc, char*argv[]) {
 		switch (menu.returnInput())
 		{
 		case 1:
-			insert.insertInfo();
+			insert.insertInfo(filename, inoutfile);
 			break;
 		case 2:
 			search.search();
