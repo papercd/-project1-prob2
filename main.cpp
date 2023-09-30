@@ -1,10 +1,11 @@
-#include <iostream>
+﻿#include <iostream>
 #include <fstream>
 #include <cmath>
 #include <limits>
 
 using namespace std; 
 
+int checkCharArray();
 int OptionInputChecker(int from, int to);
 
 class MainMenu {
@@ -42,35 +43,36 @@ class Inserter {
 			char ID[10];
 			char birthYear[4];
 			char tel[12];
-			string dep;
-
+			char dep[30];
+			
 			inoutfile.open(filename,ios::app);
 
 			if (inoutfile.is_open())
 			{
+				cin.ignore();
 				cout << "Name: ";
-				cin >> name;
+				cin.getline(name, 15);
+				inoutfile << name << ",";
 
-		
 				cout << "Student ID (10 digits): ";
 				cin >> ID;
+				inoutfile << ID << ",";
+				//check for same student ID
+				// if student ID is unique, check whether it is exactly 10 digits.
 
 				cout << "Birth Year (4 digits): ";
 				cin >> birthYear;
+				inoutfile << birthYear << ",";
+				//check whether it is exactly 4 digits.
 
-
-
+				cin.ignore();
 				cout << "Department: ";
-				cin >> dep;
-
-
+				cin.getline(dep, 30);
+				inoutfile << dep << ",";
 
 				cout << "Tel: ";
 				cin >> tel;
-
-
-
-				inoutfile << name << " " << birthYear << " "<< ID <<  " " << tel << " " << dep << "\n";
+				inoutfile << tel << "\n";
 				
 				inoutfile.close();
 			}
