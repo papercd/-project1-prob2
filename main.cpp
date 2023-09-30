@@ -1,11 +1,14 @@
 ﻿#include <iostream>
 #include <fstream>
+#include <string>
+#include <sstream>
+#include <iomanip>
 #include <cmath>
 #include <limits>
 
 using namespace std; 
 
-int checkCharArray();
+void printLine(string info);
 int OptionInputChecker(int from, int to);
 
 class MainMenu {
@@ -21,7 +24,7 @@ class MainMenu {
 		}
 
 		void getInput() {
-			//get correct input from user. error handling should be implemented. 
+			
 			cout << "> ";
 			input = OptionInputChecker(1, 4);
 		}
@@ -35,22 +38,23 @@ class Inserter {
 	public:
 
 		// NAME and STUDENT IT should not be blank. 
-		// STUDENT ID should be exactly 10 digits, BIRTH YEAR needs to be exactly 4 digits - in the correct birth year format
-		// TEL should be up to 12 digits.
+		
 
-		void insertInfo(string filename, fstream &inoutfile) {
+		void insertInfo(string filename) {
 			char name[15];
 			char ID[10];
 			char birthYear[4];
 			char tel[12];
 			char dep[30];
 			
+			fstream inoutfile;
 			inoutfile.open(filename,ios::app);
 
 			if (inoutfile.is_open())
 			{
-				cin.ignore();
+				//name should not be blank.
 				cout << "Name: ";
+				cin.ignore();
 				cin.getline(name, 15);
 				inoutfile << name << ",";
 
@@ -59,31 +63,36 @@ class Inserter {
 				inoutfile << ID << ",";
 				//check for same student ID
 				// if student ID is unique, check whether it is exactly 10 digits.
+				//Id should not be blank.
 
 				cout << "Birth Year (4 digits): ";
 				cin >> birthYear;
 				inoutfile << birthYear << ",";
-				//check whether it is exactly 4 digits.
+				//if input is inserted, check whether it is exactly 4 digits.
+				//can be left blank.
 
-				cin.ignore();
+				
 				cout << "Department: ";
+				cin.ignore();
 				cin.getline(dep, 30);
 				inoutfile << dep << ",";
+				//can be left blank.
 
 				cout << "Tel: ";
 				cin >> tel;
 				inoutfile << tel << "\n";
-				
+				//can be left blank.
+
 				inoutfile.close();
 			}
-			else cout << "Unable to open file"; 
+			else cout << "Unable to open file."; 
 		}
 
 };
 
 class Searcher {
 	public:
-		void search() {
+		void search(string filename) {
 			int option;
 			cout << "- Search -" << endl; 
 			cout << "1. Search by name" << endl; 
@@ -93,6 +102,53 @@ class Searcher {
 			cout << "5. List all" << endl;
 			cout << "> ";
 			option = OptionInputChecker(1, 5);
+
+			fstream inoutfile; 
+			inoutfile.open(filename, ios::in );
+			if (inoutfile.is_open())
+			{
+				string line;
+				switch (option)
+				{
+				case 1:
+					char name[15];
+					
+					cin.ignore();
+					cout << "Name keyword?: ";
+					cin.getline(name,15);
+
+					while (!inoutfile.eof())
+					{
+						string temp;
+
+						getline(inoutfile, line);
+						stringstream ss(line);
+
+						getline(ss, temp, ',');
+
+						
+						if (temp.compare(name) == 0 )
+						{
+							printLine(line);
+						}
+					}
+
+
+					break;
+				case 2:
+					break;
+				case 3:
+					break;
+				case 4:
+					break;
+				case 5:
+					break;
+				default:
+					break;
+				}
+				cout << endl;
+			}
+			else cout << "Unable to open file.";
 		}
 };
 
@@ -109,6 +165,21 @@ class Sorter {
 			sortOption = OptionInputChecker(1, 4);
 		}
 };
+
+void printLine(string info) {
+	string temp;
+	stringstream ss(info);
+	
+	int spaces[5] = { 25,23,12,43,22 };
+
+	for (int i = 0; i < 5 ;i++)
+	{
+		getline(ss, temp, ',');
+		cout << setw(spaces[i]-temp.length())<<left << temp;
+	}
+	cout << endl;
+}
+
 
 int OptionInputChecker(int from, int to) {
 	int input; 
@@ -136,7 +207,6 @@ int main(int argc, char*argv[]) {
 	//add another part that detects whether the string of input argument ends with .txt
 
 	string filename = argv[1];
-	fstream inoutfile;
 	
 	MainMenu menu;
 	Inserter insert; 
@@ -150,10 +220,10 @@ int main(int argc, char*argv[]) {
 		switch (menu.returnInput())
 		{
 		case 1:
-			insert.insertInfo(filename, inoutfile);
+			insert.insertInfo(filename);
 			break;
 		case 2:
-			search.search();
+			search.search(filename);
 			break; 
 		case 3:
 			sort.ChooseSortingOption();
