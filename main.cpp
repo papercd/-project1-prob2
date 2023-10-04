@@ -9,27 +9,17 @@
 
 using namespace std; 
 
-void printLine(string info);
-int OptionInputChecker(int from, int to);
+
 
 class Student{
 	public: 
 
-	/*
-	char name[15];
-	char ID[10];
-	char birthYear[4];
-	char tel[12];
-	char dep[30];
-	char *ptr[5] = {name,ID,birthYear,tel,dep};
-	*/
 	string name;
 	string ID; 
 	string birthYear; 
 	string tel; 
 	string dep; 
-
-	//string *ptr[5] = {&name,&ID,&birthYear,&tel,&dep};
+	string* order[5] = { &name,&ID,&birthYear,&tel,&dep };
 
 	Student(){
 
@@ -44,12 +34,15 @@ class Student{
 	}
 };
 
+void printLine(Student student);
+int OptionInputChecker(int from, int to);
+
 class MainMenu {
 	int input = 0; 
 	public:
 
 		void showMenu() {
-			cout << "- Main menu -"<<endl;;
+			cout << endl << "- Main menu -" << endl;;
 			cout << "1. Insertion"<<endl;;
 			cout << "2. Search"<<endl;;
 			cout << "3. Sorting Option"<<endl;;
@@ -80,7 +73,8 @@ class Inserter {
 			//char ID[11];
 			string ID; 
 			char birthYear[5];
-			char tel[13];
+			string tel;
+			//char tel[13];
 			char dep[31];
 			
 			fstream inoutfile;
@@ -91,6 +85,8 @@ class Inserter {
 			if (inoutfile.is_open())
 			{
 				cin.ignore();
+
+				//create a function to check if character in number 
 
 				cout << "Name: ";
 				getline(cin,name);
@@ -135,8 +131,14 @@ class Inserter {
 
 				
 				cout << "Tel: ";
-				cin.getline(tel,13);
-				inoutfile << tel << "\n";
+				getline(cin, tel);
+				while (tel.length() > 12)
+				{
+					cout << "Number is longer than 12 digits." << endl;
+					cout << "Please input Student ID: ";
+					getline(cin, ID);
+				}
+				inoutfile << tel<<'\n';
 				//can be left blank.
 
 				inoutfile.close();
@@ -152,7 +154,7 @@ class SearchSort {
 
 		int searchInput(){
 			int option;
-			cout << "- Search -" << endl; 
+			cout << endl << "- Search -" << endl;
 			cout << "1. Search by name" << endl; 
 			cout << "2. Search by student ID (10 numbers)" << endl;
 			cout << "3. Search by admission year (4 numbers)" << endl;
@@ -164,32 +166,89 @@ class SearchSort {
 		}
 
 		void search(string filename) {
+
 			fstream inoutfile; 
 			inoutfile.open(filename, ios::in );
 			if (inoutfile.is_open())
 			{
+				int count = 0;
+
+
+				while (!inoutfile.eof())
+				{
+					string temp;
+					getline(inoutfile, temp);
+					count++;
+				}
+
+				Student* arr;
+				arr = new Student[count];
+
+				inoutfile.clear();
+				inoutfile.seekg(0, ios::beg);
+
+				for (int i = 0; i < count; i++)
+				{
+					string line;
+					getline(inoutfile, line);
+
+					for (int j = 0; j < 5; j++)
+					{
+						stringstream ss(line);
+						string temp;
+						for (int k = 0; k < j + 1; k++)
+						{
+							getline(ss, temp, ',');
+						}
+						
+						*(arr[i].order[j]) = temp;
+						
+					}
+				}
+
+			
+				switch (sortOption)
+				{
+				case 1:
+					sort(arr,arr+count-1, compareStudentName);
+					break;
+				case 2:
+					sort(arr, arr + count-1, compareStudentID);
+					break;
+				case 3:
+					sort(arr, arr + count-1, compareStudentID);
+					break;
+				case 4:
+					sort(arr, arr + count-1, compareStudentDep);
+					break;
+				}
+			
+	
 				switch (searchInput())
 				{
-
+					
 				case 1:
 					char name[16];
 					cout << "Name keyword?: ";
 					cin.ignore();
 					cin.getline(name,16);
+					printSearchResult(name,0,arr,count);
 
-					printSearchResult(name,1,inoutfile);
 					break;
 				case 2:
 					char ID[11];
 					cout << "Enter Student ID: ";
 					cin.ignore();
 					cin.getline(ID,11);
-					
-					printSearchResult(ID,2,inoutfile);
+					printSearchResult(ID,1,arr,count);
 					
 					break;
 				case 3:
-					
+					char admYear[5];
+					cout << "Enter Admission year: ";
+					cin.ignore();
+					cin.getline(admYear, 5);
+					printSearchResult(admYear, 2, arr,count);
 
 					break;
 				case 4:
@@ -198,121 +257,84 @@ class SearchSort {
 					cin.ignore();
 					cin.getline(dep,31);
 					
-					printSearchResult(dep,4,inoutfile);
+					printSearchResult(dep,3,arr,count);
 					break;
 				case 5:
-					
-
-					//this is where you have to implement the sort 
-					//step1: read the file and count the number of lines in the file, and create an array of that size with new.
-					//read the file from the beginning again, and fill in the array with the information. 
-					int count = 0;
-					while (!inoutfile.eof())
-					{
-						string temp; 
-						getline(inoutfile,temp);
-						count++;
-					}
-
-					Student* arr; 
-					arr = new Student[count];
-
-					inoutfile.clear();
-					inoutfile.seekg(0,ios::beg);
-
-					count = 0;
-					while (!inoutfile.eof())
-					{
-						string *ptr[5] = {&arr[count].name,&arr[count].ID,&arr[count].birthYear,&arr[count].dep,&arr[count].tel};
-						
-						//char*ptr[5] = {arr[count].name,arr[count].ID,arr[count].birthYear,arr[count].dep,arr[count].tel};
-
-						string line; 
-						getline(inoutfile,line);
-						
-						for (int i = 0; i < 5; i++)
-						{	
-							stringstream ss(line);
-							string temp;
-							for (int j = 0; j < i+1; j++)
-							{
-								getline(ss,temp,',');
-							}
-							*ptr[i] = temp; 
-						}
-						count++;
-					}
-					
-					//step2: based on the sortOption, you need to sort the array that you created by comparing the target elements. 
-					// If you are sorting by Name, Admission year or department name, you take the first characters of the comparing elements and compare their ascii codes, and the one with the lower value comes 
-					// first. and if you are sorting by student ID, the smaller number comes first. the same for admission year.
-					switch (sortOption)
-					{
-					case 1:
-						sort(arr,arr+count,compareStudentName);
-						break;
-					case 2: 
-						break;
-					case 3: 
-						break; 
-					case 4: 
-						break;
-					}
-
 					for (int i = 0; i < count; i++)
 					{
-						string line; 
-						line = arr[i].name + ',' +arr[i].ID + ',' + arr[i].birthYear + ','+arr[i].dep + ','+arr[i].tel + ',';
-						printLine(line);
 					}
 					
 					break;
 				}
 				cout << endl;
+				delete[] arr;
 			}
 			else cout << "Unable to open file.";
 			inoutfile.close();
 		}
 		
+
 		// why does this need to be static? : if you want to use sort() then the comparison function need to be either static functions or non-members. What does this mean?
 
-		static bool compareStudentName(Student a, Student b){
-			
-			int length; 
 
-			if(a.name.length()<b.name.length()) 
-				length = a.name.length();
-			else length = b.name.length();
+		//private
+		static bool compareStudentName(Student a, Student b){
+			int length;
+
+			string newStringA =a.name;
+			string newStringB = b.name;
+			newStringA.erase(remove(newStringA.begin(),newStringA.end(),' '),newStringA.end());
+			newStringB.erase(remove(newStringB.begin(), newStringB.end(), ' '), newStringB.end());
+
+			if (newStringA.length() < newStringB.length())
+				length = newStringA.length();
+			else length = newStringB.length();
 			for (int i = 0; i < length; i++)
 			{
-				if (tolower(a.name[i]) < tolower(b.name[i])){
-					return true;
+				if (tolower(newStringA[i]) != tolower(newStringB[i])) {
+					return tolower(newStringA[i]) < tolower(newStringB[i]);
 				}
-					
-				else if(tolower(a.name[i] > tolower(b.name[i]))){
-					return false; 
-				}
-					
+
 			}
-			if (a.name.length()<b.name.length()){
-				return true;
-			}
-			else{
-				return false;
-			}  			
+			return newStringA.length() <= newStringB.length();
 		}
 		
+		//private
+		static bool compareStudentID(Student a, Student b){
 
-		bool compareStudentID(Student a, Student b){
-
+		
+			return stoi(a.ID) < stoi(b.ID);
 		}
+		//private
+		static bool compareStudentDep(Student a, Student b){
+			
+			
+			int length;
 
-		bool compareStudentDep(Student a, Student b){
+			if (a.dep.length() < b.dep.length())
+				length = a.dep.length();
+			else length = b.dep.length();
+			for (int i = 0; i < length; i++)
+			{
+				if (tolower(a.dep[i]) < tolower(b.dep[i])) {
+					return true;
+				}
 
+				else if (tolower(a.dep[i] > tolower(b.dep[i]))) {
+					return false;
+				}
+
+			}
+			if (a.dep.length() < b.dep.length()) {
+				return true;
+			}
+			else {
+				return false;
+			}
 		}
 
 		void ChooseSortingOption(){
-			cout << "- Sorting Option -" << endl;
+			cout << endl << "- Sorting Option -" << endl;
 			cout << "1. Sort by Name" << endl;
 			cout << "2. Sort by Student ID" << endl;
 			cout << "3. Sort by Admission year" << endl;
@@ -321,35 +343,67 @@ class SearchSort {
 			sortOption = OptionInputChecker(1, 4);
 		}
 
-		void printSearchResult(string keyword,int location,fstream &inoutfile){
-			string line;
-			string temp; 
 
-			while(!inoutfile.eof()){
-				getline(inoutfile,line);
-				stringstream ss(line);
-				for(int i= 0; i <location; i++)
-					getline(ss,temp,',');
-				if(keyword.compare(temp)==0)
-					printLine(line);
+		//private
+		void printSearchResult(string keyword, int location, Student* arr, int size) {
+			int spaces[5] = { 18,15,13,16,17 };
+			string header[5] = { "Name","Student ID","Birth Year", "Telephone", "Department" };
+			cout << endl;
+			for (int i = 0; i < 5; i++)
+			{
+				cout << setw(spaces[i]) << left << header[i];
+			}
+			cout <<endl<< "==========================================================================="<<endl;
+			
+			if (location == 0 || location == 1 || location == 3)
+			{	
+				
+				for (int i = 0; i < size; i++)
+				{
+					string* order[5] = { &arr[i].name,&arr[i].ID,&arr[i].birthYear,&arr[i].dep,&arr[i].tel };
+					if (!((*order[location]).compare(keyword)))
+					{
+						
+						for (int j = 0; j < 5; j++)
+						{
+							cout << setw(spaces[j]) << left << *order[j];
+						}
+						cout << endl;
+					}
+				}
+			}
+			else {
+
+				// if you need to search for admission year 
+				for (int i = 0; i < size; i++)
+				{
+					string* order[5] = { &arr[i].name,&arr[i].ID,&arr[i].birthYear,&arr[i].dep,&arr[i].tel };
+
+					bool equal = true; 
+				
+					for (int j = 0; j < 4; j++)
+					{
+						if (keyword[j] != arr[i].ID[j])
+						{
+							equal = false; 
+							break;
+						}
+				
+					}
+					if (equal)
+					{
+						for (int k = 0; k < 5; k++)
+						{
+							cout << setw(spaces[k]) << left << *order[k];
+						}
+						cout << endl;
+					}
+				}
 			}
 		}
 		
 };
 
-void printLine(string info) {
-	string temp;
-	stringstream ss(info);
-	
-	int spaces[5] = { 25,23,12,43,22 };
-
-	for (int i = 0; i < 5 ;i++)
-	{
-		getline(ss, temp, ',');
-		cout << setw(spaces[i]-temp.length())<< left << temp;
-	}
-	cout << endl;
-}
 
 
 int OptionInputChecker(int from, int to) {
