@@ -19,18 +19,10 @@ class Student{
 	string birthYear; 
 	string tel; 
 	string dep; 
-	string* order[5] = { &name,&ID,&birthYear,&tel,&dep };
+	string* order[5] = { &name,&ID,&birthYear,&dep,&tel };
 
 	Student(){
 
-	}
-
-	Student(char name[15],char ID[10],char birthYear[4],char tel[12], char dep[30]){
-		name = name; 
-		ID = ID; 
-		birthYear= birthYear;
-		tel = tel; 
-		dep = dep; 
 	}
 };
 
@@ -69,12 +61,9 @@ class Inserter {
 		void insertInfo(string filename) {
 			
 			string name;
-			//char name[16];
-			//char ID[11];
 			string ID; 
 			char birthYear[5];
 			string tel;
-			//char tel[13];
 			char dep[31];
 			
 			fstream inoutfile;
@@ -101,9 +90,9 @@ class Inserter {
 		
 				cout << "Student ID (10 digits): ";
 				getline(cin,ID);
-				while (ID.length() < 10 || ID.length() > 10)
+				while (ID.length() < 10 || ID.length() > 10 || ID[0] == '0')
 				{
-					cout << "ID is either not exactly 10 digits or entered blank." << endl;
+					cout << "ID is either not exactly 10 digits or entered blank or is not in the right format." << endl;
 					cout << "Please input Student ID: ";
 					getline(cin,ID);
 				}
@@ -222,8 +211,8 @@ class SearchSort {
 					sort(arr, arr + count-1, compareStudentDep);
 					break;
 				}
-			
-	
+		
+
 				switch (searchInput())
 				{
 					
@@ -248,7 +237,7 @@ class SearchSort {
 					cout << "Enter Admission year: ";
 					cin.ignore();
 					cin.getline(admYear, 5);
-					printSearchResult(admYear, 2, arr,count);
+					printSearchResult(admYear, 3, arr,count);
 
 					break;
 				case 4:
@@ -256,12 +245,28 @@ class SearchSort {
 					cout << "Enter department name: ";
 					cin.ignore();
 					cin.getline(dep,31);
-					
-					printSearchResult(dep,3,arr,count);
+					printSearchResult(dep,2,arr,count);
 					break;
 				case 5:
+					int spaces[5] = { 17,12,30,12,12 };
+					string header[5] = { "Name","Student ID","Dept", "Birth Year", "Tel" };
+					cout << endl;
+					for (int i = 0; i < 5; i++)
+					{
+						cout << setw(spaces[i]) << left << header[i];
+					}
+					cout <<endl<< "==================================================================================="<<endl;
+
 					for (int i = 0; i < count; i++)
 					{
+						//implement printLine 
+						
+						string* order[5] = { &arr[i].name, &arr[i].ID, &arr[i].dep, &arr[i].birthYear, &arr[i].tel };
+						for (int j = 0; j < 5; j++)
+						{
+							cout << setw(spaces[j]) << left << *order[j];
+						}
+						cout << endl;
 					}
 					
 					break;
@@ -346,21 +351,23 @@ class SearchSort {
 
 		//private
 		void printSearchResult(string keyword, int location, Student* arr, int size) {
-			int spaces[5] = { 18,15,13,16,17 };
-			string header[5] = { "Name","Student ID","Birth Year", "Telephone", "Department" };
+			
+			int spaces[5] = { 17,12,30,12,12 };
+			string header[5] = { "Name","Student ID","Dept", "Birth Year", "Tel" };
 			cout << endl;
 			for (int i = 0; i < 5; i++)
 			{
 				cout << setw(spaces[i]) << left << header[i];
 			}
-			cout <<endl<< "==========================================================================="<<endl;
+			cout <<endl<< "==================================================================================="<<endl;
 			
-			if (location == 0 || location == 1 || location == 3)
+			if (location == 0 || location == 1 || location == 2)
 			{	
 				
 				for (int i = 0; i < size; i++)
 				{
-					string* order[5] = { &arr[i].name,&arr[i].ID,&arr[i].birthYear,&arr[i].dep,&arr[i].tel };
+					string* order[5] = { &arr[i].name, &arr[i].ID, &arr[i].dep, &arr[i].birthYear, &arr[i].tel };
+				
 					if (!((*order[location]).compare(keyword)))
 					{
 						
@@ -377,8 +384,8 @@ class SearchSort {
 				// if you need to search for admission year 
 				for (int i = 0; i < size; i++)
 				{
-					string* order[5] = { &arr[i].name,&arr[i].ID,&arr[i].birthYear,&arr[i].dep,&arr[i].tel };
-
+					string* order[5] = { &arr[i].name,&arr[i].ID,&arr[i].dep,&arr[i].birthYear,&arr[i].tel };
+					
 					bool equal = true; 
 				
 					for (int j = 0; j < 4; j++)
