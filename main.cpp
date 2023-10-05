@@ -75,11 +75,14 @@ class Inserter {
 			{
 				cin.ignore();
 
-				//create a function to check if character in number 
-
 				cout << "Name: ";
-				getline(cin,name);
-				//cin.getline(name,16);
+				getline(cin,name);				
+				while (checkName(name))
+				{
+					cout << "the input contains a number. " << endl;
+					cout << "Please input a name: ";
+					getline(cin, name);
+				}
 				while (name.length() == 0 || name.length() > 15)
 				{
 					cout << "name is either too long (15 characters is max) or entered blank." << endl;
@@ -97,14 +100,16 @@ class Inserter {
 					getline(cin,ID);
 				}
 				//search file and see if there is 
-
-
+				while (checkID(filename,ID))
+				{
+					cout << "Student ID already exists." << endl;
+					cout << "Please input Student ID: ";
+					getline(cin, ID);
+				}
 
 				inoutfile << ID << ",";
 
-				//check for same student ID
-				// if student ID is unique, check whether it is exactly 10 digits.
-				//Id should not be blank.
+				
 				
 				cout << "Birth Year (4 digits): ";
 				cin.getline(birthYear, 5);
@@ -133,6 +138,48 @@ class Inserter {
 				inoutfile.close();
 			}
 			else cout << "Unable to open file."; 
+		}
+
+		bool checkID(string filename,string ID) {
+			fstream inoutfile;
+			inoutfile.open(filename, ios::in);
+			if (inoutfile.is_open())
+			{
+				while (!inoutfile.eof())
+				{
+					string line;
+					getline(inoutfile, line);
+					stringstream ss(line);
+
+					string temp;
+					for (int i = 0; i < 2; i++)
+					{
+						getline(ss, temp, ',');
+					}
+
+					if (!temp.compare(ID))
+					{
+						return true;
+					}
+				}
+				return false;
+			}
+			else
+			{
+				cout << "file could not be opened." << endl;
+				return NULL;
+			}
+		}
+
+		bool checkName(string name) {
+			for (int i = 0; i < name.length(); i++)
+			{
+				if (isdigit(name[i]))
+				{
+					return true;
+				}
+			}
+			return false; 
 		}
 
 };
@@ -251,6 +298,21 @@ class SearchSort {
 					int spaces[5] = { 17,12,30,12,12 };
 					string header[5] = { "Name","Student ID","Dept", "Birth Year", "Tel" };
 					cout << endl;
+					switch (sortOption)
+					{
+					case 1:
+						cout << "(Sorted by Name)" << endl;
+						break;
+					case 2: 
+						cout << "(Sorted by Student ID)" << endl;
+						break;
+					case 3: 
+						cout << "(Sorted by Admission Year)" << endl;
+						break;
+					case 4: 
+						cout << "(Sorted by Department name)" << endl;
+						break;
+					}
 					for (int i = 0; i < 5; i++)
 					{
 						cout << setw(spaces[i]) << left << header[i];
@@ -351,7 +413,21 @@ class SearchSort {
 
 		//private
 		void printSearchResult(string keyword, int location, Student* arr, int size) {
-			
+			switch (location)
+			{
+			case 0:
+				cout << "(Sorted by Name)" << endl;
+				break;
+			case 1:
+				cout << "(Sorted by Student ID)" << endl;
+				break;
+			case 3:
+				cout << "(Sorted by Admission Year)" << endl;
+				break;
+			case 2:
+				cout << "(Sorted by Department name)" << endl;
+				break;
+			}
 			int spaces[5] = { 17,12,30,12,12 };
 			string header[5] = { "Name","Student ID","Dept", "Birth Year", "Tel" };
 			cout << endl;
