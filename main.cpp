@@ -461,7 +461,10 @@ class SearchSort {
 				{
 					string temp;
 					getline(inoutfile, temp);
-					count++;
+					if (temp.find_first_not_of(' ') != string::npos)
+					{
+						count++;
+					}
 				}
 
 				Student* arr;
@@ -474,7 +477,11 @@ class SearchSort {
 				{
 					string line;
 					getline(inoutfile, line);
-
+					while (line.find_first_not_of( ' ') ==string::npos )
+					{
+						getline(inoutfile,line);
+					}
+					
 					for (int j = 0; j < 5; j++)
 					{
 						stringstream ss(line);
