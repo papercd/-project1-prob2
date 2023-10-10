@@ -10,20 +10,20 @@
 using namespace std; 
 
 
-
 class Student{
 	public: 
-
 	string name;
 	string ID; 
 	string birthYear; 
 	string tel; 
 	string dep; 
+
 	string* order[5] = { &name,&ID,&birthYear,&dep,&tel };
 
 	Student(){
 	}
 };
+
 
 class checker{
 	public: 
@@ -125,16 +125,19 @@ class checker{
 		}
 
 		void formatID(string& ID){
+			ID.erase(remove_if(ID.begin(), ID.end(), ::isspace), ID.end());
 			while (checkForChar(ID)||ID.length() < 10 || ID.length() > 10 || ID[0] == '0')
 			{
 				cout << "ID is either not exactly 10 digits or entered blank or is not in the right format.\n\n";
 				cout << "Please input Student ID: ";
 					
-				inputInfo(ID);
+				getline(cin,ID);
+				ID.erase(remove_if(ID.begin(), ID.end(), ::isspace), ID.end());
 			}
 		}
 
 		void formatBY(string& birthYear){
+			birthYear.erase(remove_if(birthYear.begin(), birthYear.end(), ::isspace), birthYear.end());
 			while (checkForChar(birthYear) || birthYear.length() != 4 || birthYear[0] == '0')
 			{
 				if (birthYear.length() == 0)
@@ -143,7 +146,9 @@ class checker{
 				}
 				cout << "Birth Year is either not exactly 4 digits or is not in the right format.\n\n";
 				cout << "Please input Birth Year: ";
-				inputInfo(birthYear);
+				getline(cin,birthYear);
+				birthYear.erase(remove_if(birthYear.begin(), birthYear.end(), ::isspace), birthYear.end());
+
 			}
 		}
 
@@ -156,12 +161,15 @@ class checker{
 			}
 		}
 
-		void formatTel(string tel){
+		void formatTel(string& tel){
+			tel.erase(remove_if(tel.begin(), tel.end(), ::isspace), tel.end());
 			while (checkForChar(tel) || tel.length() > 12)
 			{
 				cout << "Number is either longer than 12 digits or contains a character.\n\n";
 				cout << "Please input tel : ";
-				inputInfo(tel);
+				getline(cin,tel);
+				tel.erase(remove_if(tel.begin(), tel.end(), ::isspace), tel.end());
+
 			}
 		}
 };
@@ -196,9 +204,6 @@ class Inserter {
 
 	checker check; 
 	public:
-
-		
-
 		void insertInfo(string filename) {
 			
 			string name;
@@ -280,7 +285,6 @@ class SearchSort {
 
 		void printHeader(){
 
-			int printSpaces[5] = { 17,12,30,12,12 };
 			string header[5] = { "Name","Student ID","Dept", "Birth Year", "Tel" };
 
 			for (int i = 0; i < 5; i++)
@@ -344,15 +348,39 @@ class SearchSort {
 
 			string* printOrder[5] = { &student.name, &student.ID, &student.dep, &student.birthYear, &student.tel };
 
-			if (!((*printOrder[location]).compare(keyword)))
+
+			int keyLength = keyword.length();
+			int infoLength = (*printOrder[location]).length();
+
+			
+			if (keyLength <= infoLength)
 			{
-						
-				for (int j = 0; j < 5; j++)
+				bool found;
+				
+				for (int i = 0; i < infoLength - keyLength+1; i++)
 				{
-					cout << setw(printSpaces[j]) << left << *printOrder[j];
+					found = true;
+					for (int j = 0; j < keyLength; j++)
+					{
+						if (tolower(keyword[j]) != tolower((*printOrder[location])[i+j]))
+						{
+							found = false; 
+							break; 
+						}
+					}
+					if (found)
+					{
+						for (int k = 0; k < 5; k++)
+						{
+							cout << setw(printSpaces[k]) <<left << *printOrder[k];
+						}
+						cout <<endl; 
+						break;
+					}	
 				}
-				cout << endl;
+
 			}
+
 		}
 
 		void printMatchAy(string keyword,Student student){
@@ -381,19 +409,19 @@ class SearchSort {
 
 		void printSearchResult(string keyword, int location, Student* arr, int size) {
 			
-			switch (location)
+			switch (sortOption)
 			{
-			case 0:
+			case 1:
 				cout << "(Sorted by Name)\n";
 				break;
-			case 1:
-				cout << "(Sorted by Student ID)\n";
-				break;
 			case 2:
-				cout << "(Sorted by Department name)\n";
+				cout << "(Sorted by Student ID)\n";
 				break;
 			case 3:
 				cout << "(Sorted by Admission Year)\n";
+				break;
+			case 4:
+				cout << "(Sorted by Department name)\n";
 				break;
 			}
 
@@ -497,7 +525,7 @@ class SearchSort {
 					cout << "Enter Student ID: ";
 					cin.ignore();
 					check.inputInfo(ID);
-					check.formatName(ID);
+					check.formatID(ID);
 					printSearchResult(ID,1,arr,count);
 					
 					break;
@@ -544,8 +572,6 @@ class SearchSort {
 					
 					for (int i = 0; i < count; i++)
 					{
-						//implement printLine 
-						
 						string* order[5] = { &arr[i].name, &arr[i].ID, &arr[i].dep, &arr[i].birthYear, &arr[i].tel };
 						for (int j = 0; j < 5; j++)
 						{
@@ -584,6 +610,7 @@ int main(int argc, char*argv[]) {
 		return 0;
 	}
 
+
 	string filename = argv[1];
 	MainMenu menu;
 	Inserter insert; 
@@ -594,6 +621,7 @@ int main(int argc, char*argv[]) {
 	{
 		menu.showMenu();
 		menu.getInput();
+
 		switch (menu.returnInput())
 		{
 		case 1:
